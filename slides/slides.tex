@@ -1,4 +1,4 @@
-%\documentclass[handout]{beamer}
+% \documentclass[handout]{beamer}
 \documentclass{beamer}
 
 \usetheme{Copenhagen}
@@ -76,15 +76,24 @@ keepaspectratio]{sfondo.png}%
 \end{frame}
 
 
-\begin{frame}{It's 2011...}
-    Alex Krizhevsky, Ilya Sutskever, and Geoffrey Hinton want to win the ImageNet LSVRC-2010 contest, an image classification competition with over $1000$ different classes of images. 
+\begin{frame}{Setting the scene...}
+    It's 2001, and Alex Krizhevsky, Ilya Sutskever, and Geoffrey Hinton want to win the ImageNet LSVRC-2010 contest, an image classification competition with over $1000$ different classes of images. 
+    
+    \begin{center}
+        \includegraphics[scale=0.25]{theboys.png}    
+    \end{center}
 
-    \hspace{3cm}
-    \pause
+\end{frame}
+
+
+\begin{frame}{Setting the scene...}
     
     They use a subset of the ImageNet dataset consisting of $1.2$ Million $256 \times 256$ images to train a $60$ million parameter convolutional neural network they called \emph{AlexNet}.
 
-    \hspace{3cm}
+    \begin{center}
+        \includegraphics[scale=0.03]{imagenetcat.jpg}    
+    \end{center}
+
     \pause
     
     Alexnet achieves state-of-the-art performance and propels the study of deep learning into the mainstream. 
@@ -139,12 +148,13 @@ keepaspectratio]{sfondo.png}%
 \begin{center}
     \includegraphics[scale=0.28]{overparam.png}
 \end{center}
+
 \end{frame}
 
 
 \begin{frame}{What is double descent?}
     
-This paper defines double descent as: \\
+This paper defines \href{https://www.youtube.com/watch?v=Kih-VPHL3gA}{double descent} as: \\
 \hspace{1.5cm}
 
 \emph{A phenomenon in machine learning that many classes of models can, under relatively broad conditions, exhibit where as the number of parameters increases, the test loss falls, rises, then falls again.}
@@ -156,7 +166,7 @@ This paper defines double descent as: \\
 \end{frame}
 
 
-\begin{frame}{Double descent in polynomial regression - Empirical}
+\begin{frame}{Double descent in polynomial regression}
 \begin{center}
 \includegraphics[scale=0.22]{polyreg.png}
 \end{center}
@@ -179,30 +189,32 @@ This paper defines double descent as: \\
     \end{itemize}
     
     \pause
+    \hspace{5cm}
+
     We will next study linear models, which have a fixed value of $P=D+1$. Therefore, double descent occurs in the direction of increasing $N$.
 
 \end{frame}
 
 
-\begin{frame}{Double descent in linear regression - Mathematical}
+\begin{frame}{Double descent in linear regression}
 
-The underparametrized regime is the classic least-squares minimization problem:
+    The underparametrized regime is the classic least-squares minimization problem:
 
-$$\hat{\vec{\beta}}_{under} = \text{arg} \text{min}_{\vec{\beta}}||X \vec{\beta} - Y||^2_2, $$
+    $$\hat{\vec{\beta}}_{under} = \text{arg} \text{min}_{\vec{\beta}}||X \vec{\beta} - Y||^2_2, $$
 
-which is solved by
+    which is solved by
 
-$$\vec{\beta}_{under} = (X^T X)^{-1} X^T Y.$$
+    $$\vec{\beta}_{under} = (X^T X)^{-1} X^T Y.$$
 
-\pause
+    \pause
 
-For the overparameterized regime, the above optimization problem has infinite solutions. Therefore, we need to choose a different optimization problem:
+    For the overparameterized regime, the above optimization problem has infinite solutions. Therefore, we need to choose a different optimization problem:
 
-$$\hat{\vec{\beta}}_{over} = \text{arg} \text{min}_{\vec{\beta}}||\vec{\beta}||^2_2 \text{   s.t.   } \forall n \in (1,\dots,N) \text{   } \vec{x}_n \vec{\beta} = y_n$$
+    $$\hat{\vec{\beta}}_{over} = \text{arg} \text{min}_{\vec{\beta}}||\vec{\beta}||^2_2 \text{   s.t.   } \forall n \in (1,\dots,N) \text{   } \vec{x}_n \vec{\beta} = y_n$$
 
-which is solved by
+    which is solved by
 
-$$\vec{\beta}_{over} = X^T (X X^T)^{-1}Y.$$
+    $$\vec{\beta}_{over} = X^T (X X^T)^{-1}Y.$$
 
 \end{frame}
 
@@ -211,18 +223,148 @@ $$\vec{\beta}_{over} = X^T (X X^T)^{-1}Y.$$
 
     $$\hat{\vec{\beta}}_{over} = \text{arg} \text{min}_{\vec{\beta}}||\vec{\beta}||^2_2 \text{   s.t.   } \forall n \in (1,\dots,N) \text{   } \vec{x}_n \vec{\beta} = y_n$$
 
-We choose this optimization problem because \emph{it is the optimization problem that gradient decent implicity minimizes}!
+    \hspace{5cm}
+
+    We choose this optimization problem because \emph{it is the optimization problem that gradient decent implicity minimizes}!
     
+\end{frame}
+
+\begin{frame}{The main equation}
+
+    Unknown to us and the model is the ideal linear parameters $\beta^*$ that truly minimize the test mean squared error. We write 
+
+    $$Y=X\beta^* + E$$
+
+    where $E$ is the uncapturable error. \footnote{$E$ could either be due to a inherently non-linear true relationship or a noisy but linear relationship.}
+
+    \pause
+
+    For the underparameterized regime we have
+    \begin{eqnarray*}
+        \hat{y}_{test,under} & = & \vec{x}_{test} \cdot (X^T X)^{-1}X^T Y \\
+        \hat{y}_{test,under} & = & \vec{x}_{test} (X^T X)^{-1} X^T E  + y^*_{test} \\
+        \hat{y}_{test,under} - y^*_{test} & = & \vec{x}_{test} (X^T X)^{-1} X^T E.
+    \end{eqnarray*}
+
+\end{frame}
+
+\begin{frame}{The main equation}
+    One last step before the main equation...
+
+    \hspace{5cm}
+    \pause
+
+    We replace $X$ with its singular value decomposition
+
+    $$X = U \Sigma V^T$$
+
+    with singular values $\sigma_1 > \sigma_2 \dots > \sigma_R > 0.$ The singular values are the square roots of the eigen values of $X$ , ie $\sigma_r=\sqrt{\lambda_r}.$
+\end{frame}
+
+\begin{frame}{The main equation}
+    We get the following
+
+    \begin{eqnarray*}
+        \hat{y}_{test,over} - y^*_{test} = & \sum_{r=1}^R \frac{1}{\sigma_r}(\vec{x}_{test} \cdot \vec{v}_r)(\vec{u}_r \cdot E) & + \text{ bias term}\\
+        \hat{y}_{test,under}- y^*_{test} = & \sum_{r=1}^R \frac{1}{\sigma_r}(\vec{x}_{test} \cdot \vec{v}_r)(\vec{u}_r \cdot E) &
+    \end{eqnarray*}
+
+    where the bias term is $\vec{x}_{test} (X^T (XX^T)^{-1}X-I_D)\beta^*$.
+
+    \hfill
+    \pause
+
+    The variance term causes double descent!
+
+\end{frame}
+
+\begin{frame}{Intuition for components of variance term}
+    \begin{equation}
+        \sum_{r=1}^R \frac{1}{\sigma_r}(\vec{x}_{test} \cdot \vec{v}_r)(\vec{u}_r \cdot E)
+    \end{equation}
+    
+    Double descent happens when all three of these terms grow large!
+    
+    \begin{itemize}
+        \item How much the \emph{training features} $X$ vary in each direction
+            $$\frac{1}{\sigma_r}$$
+        \pause
+        \item How much, and which direction, the \emph{test features} $\vec{x}_{test}$ vary relative to the \emph{training features} $X$
+        $$\vec{x}_{test} \cdot \vec{v}_r$$
+        \pause
+        \item How well the \emph{best possible model} can correlate the variance in the \emph{training features} $X$ with the \emph{training regression targets} $Y$
+            $$\vec{u}_r \cdot E$$
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}{Why do small singular values $\sigma_r$ happen near $P=D$?}
+    \begin{center}
+        \includegraphics[scale=0.28]{singularvals.png}
+    \end{center}
+\end{frame}
+
+
+\begin{frame}{The other components of the variance term}
+    \begin{equation*}
+        \sum_{r=1}^R \frac{1}{\sigma_r}(\vec{x}_{test} \cdot \vec{v}_r)(\vec{u}_r \cdot E)
+    \end{equation*}
+
+    How do the other terms contribute to double descent?
+
+    \begin{itemize}
+        \item The test datum does not vary in different directions than the training features. If the test datum lies entirely in the subspace of just a few of the leading singular directions, then double descent is unlikely to occur.
+        \item If $E = \vec{0}$, (ie the true function is linear), the variance at and after the interpolation threshold is $0$. 
+    \end{itemize}
+
+    \hspace{5cm}
+    \pause
+
+    We are going to "remove" each of these contributions to the variance and exhibit that double descent does not occur. 
+\end{frame}
+
+
+\begin{frame}{}
+    \begin{center}
+        \includegraphics[scale=0.31]{ablate1.png}
+        % \hspace{10cm}
+        \includegraphics[scale=0.31]{ablate2.png}
+    \end{center}
 \end{frame}
 
 
 \begin{frame}{Double descent in nonlinear models - Intuition}
-TODO
+
+    Neural networks are composed of multiple successive linear regression problems with non-linear activation functions. In many cases training neural networks is equivalent to linear regression on a certain set of features that are functions of the training data. 
+
+    \hspace{5cm}
+
+    \pause
+    
+    \tiny
+    
+    "It's interesting to note that we're observing double-descent in the absence of label noise. That is to say: the inputs and targets are exactly the same. Here, the “noise” arises from the lossy compression happening in the down projection.” Our tutorial clarifies that noise in the sense of a random unpredictable quantity is not necessary to produce double descent. Rather, what is necessary is residual errors from the perspective of the model class. Those residual errors could be entirely deterministic, such as a nonlinear model attempting to fit a noiseless linear relationship."
+    
+    \hspace{5cm}
+
+    Tom Henighan, Shan Carter, Tristan Hume, Nelson Elhage, Robert Lasenby, Stanislav Fort,
+    Nicholas Schiefer, and Christopher Olah. Double descent in the condition number. \emph{Transformer
+    Circuits Thread, 2023}.
 \end{frame}
 
 
 \begin{frame}{Summary}
-TODO
+    In this talk we covered
+    \begin{itemize}
+        \item We \emph{identified} double descent in various regression problems
+        \item We \emph{interpreted} the components of the variance term in the test error that contribute to double descent
+        \item We \emph{ablated} the components for a dataset to demonstrate that double descent occurs only when all components are large near the interpolation threshhold
+    \end{itemize}
+
+    \hspace{5cm}
+
+    We also argued that in linear and non-linear models we expect the double descent behavior in a probabalistic sense without intentional ablation.
+
 \end{frame}
 
 
